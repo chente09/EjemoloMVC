@@ -1,0 +1,43 @@
+﻿@model EjemoloMVC.Models.Pokemon
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-capitalize">@Model.Name</h2>
+        <a asp-action="Index" class="btn btn-secondary">← Volver al Inicio</a>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <div class="row">
+            <!-- Imagen del Pokémon -->
+            <div class="col-md-4 text-center">
+                <img src="@Model.Sprites.FrontDefault" alt="@Model.Name" class="img-fluid" style="max-width: 250px;">
+            </div>
+
+            <!-- Datos del Pokémon -->
+            <div class="col-md-8">
+                <h4>Información Básica</h4>
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item"><strong>ID:</strong> @Model.Id</li>
+                    <li class="list-group-item"><strong>Altura:</strong> @Model.Height</li>
+                    <li class="list-group-item"><strong>Peso:</strong> @Model.Weight</li>
+                </ul>
+
+                <h4>Habilidades</h4>
+                <ul class="list-group list-group-flush mb-4">
+                    @foreach (var ability in Model.Abilities)
+                    {
+                        <li class="list-group-item text-capitalize">@ability.Ability.Name</li>
+                    }
+                </ul>
+
+                <h4>Tipos</h4>
+                <ul class="list-group list-group-flush">
+                    @foreach (var type in Model.Types)
+                    {
+                        <li class="list-group-item text-capitalize">@type.Type.Name</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
