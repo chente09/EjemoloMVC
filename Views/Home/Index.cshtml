@@ -1,49 +1,75 @@
-﻿@model List<EjemoloMVC.Services.PokemonItem>
+﻿@model List<EjemoloMVC.Models.Breed>
 
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Lista de Pokémon</h1>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Lista de Razas de Perros</h1>
 
-    <table class="table table-hover table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Imagen</th>
-                <th>Nombre</th>
-                <th>Detalles</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var (pokemon, index) in Model.Select((p, i) => (p, i + ViewBag.Offset + 1)))
-            {
+        @if (Model.Any())
+    {
+        <table class="table table-hover table-bordered">
+            <thead class="table-dark">
                 <tr>
-                    <td>@index</td>
+                    <th>Nombre</th>
+                    <th>Esperanza de vida</th>
+                    <th>Criado para</th>
+                    <th>Temperamento</th>
+                    <th>Imagen</th>
+                    <th>Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var breed in Model)
+                {
+                <tr>
+                    <td class="text-capitalize">@breed.Name</td>
+                    <td>@breed.LifeSpan</td>
+                    <td>@breed.BredFor</td>
+                    <td>@breed.Temperament</td>
                     <td>
-                        <img src="@pokemon.ImageUrl" alt="@pokemon.Name" class="img-fluid" width="70" height="70" />
+                        @if (!string.IsNullOrEmpty(breed.Image?.Url))
+                        {
+                            <img src="@breed.Image.Url" onerror="this.onerror=null;this.src='/images/no-image.png';" class="img-fluid" style="max-width: 100px;" />
+                        }
+                        else
+                        {
+                        <span class="text-muted">No disponible</span>
+                        }
                     </td>
-                    <td class="text-capitalize">@pokemon.Name</td>
                     <td>
-                        <a asp-controller="Home" asp-action="Details" asp-route-name="@pokemon.Name" class="btn btn-info">
+                        <a asp-controller="Home" asp-action="Details" asp-route-id="@breed.Id" class="btn btn-info">
                             Ver Detalles
                         </a>
                     </td>
                 </tr>
-            }
-        </tbody>
-    </table>
+                }
+            </tbody>
+        </table>
 
-    <div class="d-flex justify-content-between mt-4">
-        @if (ViewBag.Previous != null)
-        {
-            <a asp-action="Index" asp-route-offset="@ViewBag.Previous" class="btn btn-primary">← Anterior</a>
-        }
-        else
-        {
-            <span></span>
-        }
-
-        @if (ViewBag.Next != null)
-        {
-            <a asp-action="Index" asp-route-offset="@ViewBag.Next" class="btn btn-primary">Siguiente →</a>
-        }
+ <!-- Controles de paginación -->
+        <nav aria-label="Paginación">
+            <ul class="pagination justify-content-center">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, limit = ViewBag.Limit })">Anterior</a>
+                </li>
+                }
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = i, limit = ViewBag.Limit })">@i</a>
+                </li>
+                }
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, limit = ViewBag.Limit })">Siguiente</a>
+                </li>
+                }
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <p class="text-center text-muted">No se encontraron razas.</p>
+    }
     </div>
-</div>

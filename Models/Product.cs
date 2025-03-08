@@ -2,61 +2,40 @@
 
 namespace EjemoloMVC.Models
 {
-    public class Pokemon
+    public class Dog
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int Height { get; set; }
-        public int Weight { get; set; }
-        public Sprites Sprites { get; set; } // Asegúrate de que esta propiedad esté correctamente mapeada
-        public List<AbilityInfo> Abilities { get; set; }
-        public List<TypeInfo> Types { get; set; }
+        public string Id { get; set; } = string.Empty;
+
+        [JsonProperty("url")]
+        public string ImageUrl { get; set; } = string.Empty;
+
+        [JsonProperty("breeds")]
+        public List<Breed>? Breeds { get; set; } = new();
     }
 
-    public class Sprites
+    public class Breed
     {
-        [JsonProperty("back_default")]
-        public string BackDefault { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
-        [JsonProperty("back_female")]
-        public string BackFemale { get; set; }
+        [JsonProperty("life_span")]
+        public string LifeSpan { get; set; } = string.Empty;
 
-        [JsonProperty("back_shiny")]
-        public string BackShiny { get; set; }
+        [JsonProperty("bred_for")]
+        public string BredFor { get; set; } = string.Empty;
 
-        [JsonProperty("back_shiny_female")]
-        public string BackShinyFemale { get; set; }
+        public string Temperament { get; set; } = string.Empty;
 
-        [JsonProperty("front_default")]
-        public string FrontDefault { get; set; }
-
-        [JsonProperty("front_female")]
-        public string FrontFemale { get; set; }
-
-        [JsonProperty("front_shiny")]
-        public string FrontShiny { get; set; }
-
-        [JsonProperty("front_shiny_female")]
-        public string FrontShinyFemale { get; set; }
+        [JsonProperty("image")]
+        public Image? Image { get; set; } // Propiedad para la imagen
     }
 
-    public class AbilityInfo
+    public class Image
     {
-        public Ability Ability { get; set; }
-    }
+        [JsonProperty("id")]
+        public string Id { get; set; } = string.Empty;
 
-    public class Ability
-    {
-        public string Name { get; set; }
-    }
-
-    public class TypeInfo
-    {
-        public TypeDetail Type { get; set; }
-    }
-
-    public class TypeDetail
-    {
-        public string Name { get; set; }
+        [JsonProperty("url")]
+        public string Url { get; set; } = string.Empty;
     }
 }

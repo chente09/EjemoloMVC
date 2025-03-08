@@ -1,4 +1,4 @@
-﻿@model EjemoloMVC.Models.Pokemon
+﻿@model EjemoloMVC.Models.Breed
 
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -8,34 +8,24 @@
 
     <div class="card shadow-sm p-4">
         <div class="row">
-            <!-- Imagen del Pokémon -->
             <div class="col-md-4 text-center">
-                <img src="@Model.Sprites.FrontDefault" alt="@Model.Name" class="img-fluid" style="max-width: 250px;">
+                @if (!string.IsNullOrEmpty(Model.Image?.Url))
+                    {
+                      <img src="@Model.Image.Url" alt="@Model.Name" class="img-fluid rounded"
+                      onerror="this.onerror=null;this.src='/images/no-image.png';" />
+                    }
+                    else
+                    {
+                      <p class="text-muted">No hay imagen disponible</p>
+                    }
             </div>
-
-            <!-- Datos del Pokémon -->
             <div class="col-md-8">
                 <h4>Información Básica</h4>
                 <ul class="list-group list-group-flush mb-4">
-                    <li class="list-group-item"><strong>ID:</strong> @Model.Id</li>
-                    <li class="list-group-item"><strong>Altura:</strong> @Model.Height</li>
-                    <li class="list-group-item"><strong>Peso:</strong> @Model.Weight</li>
-                </ul>
-
-                <h4>Habilidades</h4>
-                <ul class="list-group list-group-flush mb-4">
-                    @foreach (var ability in Model.Abilities)
-                    {
-                        <li class="list-group-item text-capitalize">@ability.Ability.Name</li>
-                    }
-                </ul>
-
-                <h4>Tipos</h4>
-                <ul class="list-group list-group-flush">
-                    @foreach (var type in Model.Types)
-                    {
-                        <li class="list-group-item text-capitalize">@type.Type.Name</li>
-                    }
+                    <li class="list-group-item"><strong>Nombre:</strong> @Model.Name</li>
+                    <li class="list-group-item"><strong>Esperanza de vida:</strong> @(string.IsNullOrEmpty(Model.LifeSpan) ? "Desconocida" : Model.LifeSpan)</li>
+                    <li class="list-group-item"><strong>Criado para:</strong> @(string.IsNullOrEmpty(Model.BredFor) ? "No especificado" : Model.BredFor)</li>
+                    <li class="list-group-item"><strong>Temperamento:</strong> @(string.IsNullOrEmpty(Model.Temperament) ? "No disponible" : Model.Temperament)</li>
                 </ul>
             </div>
         </div>

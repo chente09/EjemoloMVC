@@ -2,22 +2,25 @@ using EjemoloMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpClient<PokemonService>();
+// Configurar el servicio HTTP con HttpClient
+builder.Services.AddHttpClient<DogService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.thedogapi.com/v1/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
 
-// Add services to the container.
+// Agregar servicios MVC
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configurar middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(

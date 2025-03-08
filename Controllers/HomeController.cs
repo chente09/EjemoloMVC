@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using EjemoloMVC.Models;
 using EjemoloMVC.Services;
 using System.Threading.Tasks;
 
@@ -8,41 +6,32 @@ namespace EjemoloMVC.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly PokemonService _pokemonService;
+        private readonly DogService _dogService;
 
-        public HomeController(ILogger<HomeController> logger, PokemonService pokemonService)
+        public HomeController(DogService dogService)
         {
-            _logger = logger;
-            _pokemonService = pokemonService;
+            _dogService = dogService;
         }
 
-        public async Task<IActionResult> Index(int offset = 0)
+        // Mostrar la lista de razas
+        public async Task<IActionResult> Index(int page = 1, int limit = 10)
         {
-            var pokemonsResponse = await _pokemonService.GetPokemonsAsync(offset, 20);
-
-            ViewBag.Offset = offset;
-            ViewBag.Next = offset + 20;
-            ViewBag.Previous = (offset - 20) >= 0 ? offset - 20 : (int?)null;
-
-            return View(pokemonsResponse.Results);
+            var breeds = await _dogService.GetBreedsAsync(page, limit);
+            ViewBag.CurrentPage = page;
+            ViewBag.Limit = limit;
+            ViewBag.TotalPages = 10; 
+            return View(breeds);
         }
 
-        public async Task<IActionResult> Details(string name)
+        // Mostrar detalles de una raza específica
+        public async Task<IActionResult> Details(string id)
         {
-            var pokemon = await _pokemonService.GetPokemonAsync(name);
-            return View(pokemon);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var breed = await _dogService.GetBreedByIdAsync(id);
+            if (breed == null || string.IsNullOrEmpty(breed.Name))
+            {
+                return NotFound();
+            }
+            return View(breed);
         }
     }
 }

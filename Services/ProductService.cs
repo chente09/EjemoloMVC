@@ -3,65 +3,59 @@ using Newtonsoft.Json;
 
 namespace EjemoloMVC.Services
 {
-    public class PokemonService
+    public class DogService
     {
         private readonly HttpClient _httpClient;
 
-        public PokemonService(HttpClient httpClient)
+        public DogService(HttpClient httpClient)
         {
             _httpClient = httpClient;
+            _httpClient.BaseAddress = new Uri("https://api.thedogapi.com/v1/");
         }
 
-        public async Task<PokemonResponse> GetPokemonsAsync(int offset = 0, int limit = 20)
+        // Obtener la lista de razas
+        public async Task<List<Breed>> GetBreedsAsync(int page = 1, int limit = 10)
         {
-            var response = await _httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon?offset={offset}&limit={limit}");
-            var pokemons = JsonConvert.DeserializeObject<PokemonResponse>(response);
+            var response = await _httpClient.GetStringAsync($"breeds?page={page}&limit={limit}");
+            var breeds = JsonConvert.DeserializeObject<List<Breed>>(response) ?? new List<Breed>();
 
-            if (pokemons?.Results != null)
+            // Si una raza no tiene imagen, intenta obtener una
+            foreach (var breed in breeds)
             {
-                foreach (var item in pokemons.Results)
+                if (breed.Image == null || string.IsNullOrEmpty(breed.Image.Url))
                 {
-                    // Extraemos el ID desde la URL, que siempre termina en /{id}/
-                    var segments = item.Url.TrimEnd('/').Split('/');
-                    var id = segments.Last();
-
-                    // Generamos la URL de la imagen
-                    item.ImageUrl = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{id}.png";
+                    var imgResponse = await _httpClient.GetStringAsync($"images/search?breed_id={breed.Id}");
+                    var images = JsonConvert.DeserializeObject<List<Image>>(imgResponse);
+                    if (images != null && images.Count > 0)
+                    {
+                        breed.Image = images.First();
+                    }
                 }
             }
 
-            return pokemons ?? new PokemonResponse();
+            return breeds;
         }
 
 
-
-        public async Task<Pokemon> GetPokemonAsync(string param)
+        // Obtener detalles de una raza por ID
+        public async Task<Breed> GetBreedByIdAsync(string id)
         {
-            var response = await _httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon/{param}");
-            var pokemon = JsonConvert.DeserializeObject<Pokemon>(response);
+            var response = await _httpClient.GetStringAsync($"breeds/{id}");
+            var breed = JsonConvert.DeserializeObject<Breed>(response) ?? new Breed();
 
-            if (pokemon == null)
+            // Si la raza no tiene imagen, buscarla en el endpoint de imágenes
+            if (breed.Image == null || string.IsNullOrEmpty(breed.Image.Url))
             {
-                throw new Exception("No se pudo deserializar el Pokémon.");
+                var imgResponse = await _httpClient.GetStringAsync($"images/search?breed_id={id}");
+                var images = JsonConvert.DeserializeObject<List<Image>>(imgResponse);
+                if (images != null && images.Count > 0)
+                {
+                    breed.Image = images.First();
+                }
             }
 
-            return pokemon;
+            return breed;
         }
-    }
 
-    public class PokemonResponse
-    {
-        public int Count { get; set; }
-        public string Next { get; set; }
-        public string Previous { get; set; }
-        public List<PokemonItem> Results { get; set; }
     }
-
-    public class PokemonItem
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Url { get; set; } = string.Empty;
-        public string ImageUrl { get; set; } = string.Empty;
-    }
-
 }
